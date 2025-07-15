@@ -18,8 +18,19 @@ body {
 }
 
 h1 {
+  font-family: 'Anton', sans-serif;
+  font-size: 1.5rem;
+  color: #003366;
+  margin: 0.5rem 0 0.25rem;
+  line-height: 1.2;
+  text-align: center;
+  text-shadow: 1px 1px 0 #fff;
+}
+
+h2 {
   text-align: center;
   color: #003366;
+  margin-top: 0.25rem;
   margin-bottom: 1.5rem;
 }
 
@@ -75,4 +86,16 @@ button {
 
 button:hover {
   background: #005fa3;
+}
+
+.brand-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.brand-header img {
+  width: 90px;
+  height: auto;
 }
