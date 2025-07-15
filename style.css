@@ -76,3 +76,24 @@ button {
 button:hover {
   background: #005fa3;
 }
+
+.brand-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.brand-header img {
+  width: 70px;
+  height: auto;
+}
+
+.brand-header h1 {
+  font-family: 'Anton', sans-serif;
+  font-size: 1.75rem;
+  color: #003366;
+  margin: 0;
+  line-height: 1.1;
+  text-shadow: 1px 1px 0 #fff;
+}
