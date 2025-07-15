@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request a Plumbing Quote | A-1 Affordable Plumbing Services</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f8fb;
+      padding: 40px;
+      margin: 0;
+    }
+
+    .form-container {
+      background: #ffffff;
+      max-width: 600px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+      text-align: center;
+      color: #0074b7;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      margin-right: 10px;
+    }
+
+    button {
+      width: 100%;
+      background-color: #0074b7;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005f99;
+    }
+
+    .checkbox-group {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Request a Plumbing Quote</h2>
+    <form action="https://formspree.io/f/xdkepwjd" method="POST" enctype="multipart/form-data">
+
+      <label>
+        Full Name:
+        <input type="text" name="name" required>
+      </label>
+
+      <label>
+        Address:
+        <input type="text" name="address" required>
+      </label>
+
+      <label>
+        Phone Number:
+        <input type="tel" name="phone" required>
+      </label>
+
+      <label>
+        Email Address:
+        <input type="email" name="_replyto" required>
+      </label>
+
+      <label>
+        Property Type:
+        <select name="property_type" required>
+          <option value="">Select</option>
+          <option value="Residential">Residential</option>
+          <option value="Commercial">Commercial</option>
+        </select>
+      </label>
+
+      <label>Type of Issue (check all that apply):</label>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="issue" value="Leak"> Leak</label>
+        <label><input type="checkbox" name="issue" value="Clog"> Clog</label>
+        <label><input type="checkbox" name="issue" value="Water Heater"> Water Heater</label>
+        <label><input type="checkbox" name="issue" value="Toilet"> Toilet</label>
+        <label><input type="checkbox" name="issue" value="Sewer Line"> Sewer Line</label>
+        <label><input type="checkbox" name="issue" value="Other"> Other</label>
+      </div>
+
+      <label>
+        Describe the Problem:
+        <textarea name="description" rows="4" required></textarea>
+      </label>
+
+      <label>
+        When did the problem start?
+        <input type="text" name="start_time">
+      </label>
+
+      <label>
+        Upload Photos (up to 5):
+        <input type="file" name="photos" accept="image/*" multiple>
+      </label>
+
+      <label>
+        Upload Video (optional):
+        <input type="file" name="video" accept="video/*">
+      </label>
+
+      <label>
+        Access Notes (pets, gates, codes):
+        <textarea name="access_notes" rows="2"></textarea>
+      </label>
+
+      <label>
+        Best time to contact or schedule:
+        <input type="text" name="availability">
+      </label>
+
+      <button type="submit">Submit Request</button>
+    </form>
+  </div>
+</body>
+</html>
+
