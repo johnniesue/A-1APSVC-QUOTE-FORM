@@ -14,11 +14,13 @@
       <h1 contenteditable="true">A-1 AFFORDABLE PLUMBING SERVICES</h1>
     </div>
     <h2>Request a Plumbing Quote</h2>
-<label>Full Name:<input type="text" id="name" name="name" required></label>
-<label>Address:<input type="text" id="address" name="address" required></label>
-<label>Phone Number:<input type="tel" id="phone" name="phone" required></label>
-<label>Email Address:<input type="email" id="email" name="email" required></label>
 
+    <!-- ✅ The Form -->
+    <form onsubmit="submitQuote(event)">
+      <label>Full Name:<input type="text" id="name" name="name" required></label>
+      <label>Address:<input type="text" id="address" name="address" required></label>
+      <label>Phone Number:<input type="tel" id="phone" name="phone" required></label>
+      <label>Email Address:<input type="email" id="email" name="email" required></label>
 
       <label>Property Type:
         <select name="property_type" required>
@@ -38,7 +40,7 @@
         <label><input type="checkbox" name="issue[]" value="Other"> Other</label>
       </fieldset>
 
-<label>Describe the Problem:<textarea id="description" name="problem_description" rows="4" required></textarea></label>
+      <label>Describe the Problem:<textarea id="description" name="problem_description" rows="4" required></textarea></label>
       <label>When did the problem start?<input type="text" name="start_date"></label>
       <label>Upload Photos:<input type="file" name="photos" multiple></label>
       <label>Upload Video:<input type="file" name="video"></label>
@@ -48,57 +50,54 @@
       <button type="submit">Submit Request</button>
     </form>
   </div>
-<!-- Firebase App (core) -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 
-<!-- Firestore -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <!-- ✅ Firebase App (core) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <!-- ✅ Firebase Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-<script>
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCZF03KFNUK_TqG5_dU2d0oaR1XuzcES4",
-    authDomain: "a1apsvc-plumbing-workspace.firebaseapp.com",
-    projectId: "a1apsvc-plumbing-workspace",
-    storageBucket: "a1apsvc-plumbing-workspace.appspot.com",
-    messagingSenderId: "752317638867",
-    appId: "1:752317638867:web:c4af700064698bb7d4d26c",
-    measurementId: "G-H8DZKBNENH"
-  };
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-  const collection = firebase.firestore().collection;
-
-
-  window.submitQuote = async function (event) {
-    event.preventDefault();
-
-    const name = document.querySelector("#name").value;
-    const address = document.querySelector("#address").value;
-    const email = document.querySelector("#email").value;
-    const phone = document.querySelector("#phone").value;
-    const description = document.querySelector("#description").value;
-
-    const quote = {
-      name,
-      address,
-      email,
-      phone,
-      description,
-      submittedAt: new Date()
+  <!-- ✅ Your Firebase Script -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZF03KFNUK_TqG5_dU2d0oaR1XuzcES4",
+      authDomain: "a1apsvc-plumbing-workspace.firebaseapp.com",
+      projectId: "a1apsvc-plumbing-workspace",
+      storageBucket: "a1apsvc-plumbing-workspace.appspot.com",
+      messagingSenderId: "752317638867",
+      appId: "1:752317638867:web:c4af700064698bb7d4d26c",
+      measurementId: "G-H8DZKBNENH"
     };
 
-    try collection("quotes").add(quote)
-  .then(() => {
-    alert("✅ Quote submitted successfully!");
-  })
-  .catch((e) => {
-    console.error("Error saving to Firestore:", e);
-    alert("❌ Error submitting quote. See console for details.");
-  });
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-</script>
+    window.submitQuote = async function (event) {
+      event.preventDefault();
 
+      const name = document.querySelector("#name").value;
+      const address = document.querySelector("#address").value;
+      const email = document.querySelector("#email").value;
+      const phone = document.querySelector("#phone").value;
+      const description = document.querySelector("#description").value;
+
+      const quote = {
+        name,
+        address,
+        email,
+        phone,
+        description,
+        submittedAt: new Date()
+      };
+
+      try {
+        await db.collection("quotes").add(quote);
+        alert("✅ Quote submitted successfully!");
+      } catch (e) {
+        console.error("Error saving to Firestore:", e);
+        alert("❌ Error submitting quote. See console for details.");
+      }
+    };
+  </script>
 </body>
 </html>
+
