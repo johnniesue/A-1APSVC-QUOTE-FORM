@@ -48,5 +48,50 @@
       <button type="submit">Submit Request</button>
     </form>
   </div>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCZF03KFNUK_TqG5_dU2d0oaR1XuzcES4",
+    authDomain: "a1apsvc-plumbing-workspace.firebaseapp.com",
+    projectId: "a1apsvc-plumbing-workspace",
+    storageBucket: "a1apsvc-plumbing-workspace.appspot.com",
+    messagingSenderId: "752317638867",
+    appId: "1:752317638867:web:c4af700064698bb7d4d26c",
+    measurementId: "G-H8DZKBNENH"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.submitQuote = async function (event) {
+    event.preventDefault();
+
+    const name = document.querySelector("#name").value;
+    const address = document.querySelector("#address").value;
+    const email = document.querySelector("#email").value;
+    const phone = document.querySelector("#phone").value;
+    const description = document.querySelector("#description").value;
+
+    const quote = {
+      name,
+      address,
+      email,
+      phone,
+      description,
+      submittedAt: new Date()
+    };
+
+    try {
+      await addDoc(collection(db, "quotes"), quote);
+      alert("✅ Quote submitted successfully!");
+    } catch (e) {
+      console.error("Error saving to Firestore:", e);
+      alert("❌ Error submitting quote. See console for details.");
+    }
+  };
+</script>
+
 </body>
 </html>
