@@ -68,6 +68,8 @@
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+  const collection = firebase.firestore().collection;
+
 
   window.submitQuote = async function (event) {
     event.preventDefault();
