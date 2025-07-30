@@ -89,14 +89,15 @@ const db = firebase.firestore();
       submittedAt: new Date()
     };
 
-    try {
-      await addDoc(collection(db, "quotes"), quote);
-      alert("✅ Quote submitted successfully!");
-    } catch (e) {
-      console.error("Error saving to Firestore:", e);
-      alert("❌ Error submitting quote. See console for details.");
-    }
-  };
+    try collection("quotes").add(quote)
+  .then(() => {
+    alert("✅ Quote submitted successfully!");
+  })
+  .catch((e) => {
+    console.error("Error saving to Firestore:", e);
+    alert("❌ Error submitting quote. See console for details.");
+  });
+
 </script>
 
 </body>
