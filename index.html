@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Request a Plumbing Quote | A-1 Affordable Plumbing Services</title>
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-10849700032"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'AW-10849700032');
   </script>
@@ -82,18 +82,18 @@
 <body>
   <div class="form-container">
     <h2>Request a Plumbing Quote</h2>
-    <form id="quoteForm">
+    <form id="quoteForm" method="POST" action="https://formspree.io/f/your-form-id">
       <label for="name">Name:</label>
-      <input type="text" id="name" name="name" required>
+      <input type="text" id="name" name="name" required />
 
       <label for="phone">Phone Number:</label>
-      <input type="tel" id="phone" name="phone" required>
+      <input type="tel" id="phone" name="phone" required />
 
       <label for="email">Email Address:</label>
-      <input type="email" id="email" name="_replyto" required>
+      <input type="email" id="email" name="_replyto" required />
 
       <label for="address">Service Address:</label>
-      <input type="text" id="address" name="address" required>
+      <input type="text" id="address" name="address" required />
 
       <label for="details">Job Details:</label>
       <textarea id="details" name="details" rows="4" required></textarea>
@@ -107,11 +107,16 @@
     document.addEventListener('DOMContentLoaded', function () {
       const form = document.getElementById('quoteForm');
       if (form) {
-        form.addEventListener('submit', function () {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault(); // Prevent default submission
+
           gtag('event', 'conversion', {
             'send_to': 'AW-10849700032/2nYgCNmZqZgZEOmZxZMo',
             'value': 1.0,
-            'currency': 'USD'
+            'currency': 'USD',
+            'event_callback': function () {
+              form.submit(); // Submit after tag fires
+            }
           });
         });
       }
@@ -119,4 +124,3 @@
   </script>
 </body>
 </html>
-
