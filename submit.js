@@ -4,12 +4,13 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
   const form = e.target;
   const responseMessage = document.getElementById("responseMessage");
 
-  const data = {
+ const data = {
   full_name: form.name.value,
   phone_number: form.phone.value,
   email: form.email.value,
   address: form.address.value,
-  issue_types: form.details.value
+  issue_types: [form.details.value],
+  property_type: form.property_type.value
 };
 
   try {
