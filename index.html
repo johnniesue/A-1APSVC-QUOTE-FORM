@@ -93,44 +93,41 @@
     </form>
   </div>
 
-  <!-- Google Ads conversion event + Supabase submission -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const form = document.getElementById('quoteForm');
       if (form) {
         form.addEventListener('submit', function (e) {
-          e.preventDefault(); // Prevent default submission
+          e.preventDefault();
 
           gtag('event', 'conversion', {
             'send_to': 'AW-10849700032/2nYgCNmZqZgZEOmZxZMo',
             'value': 1.0,
-            'currency': 'USD',
-            'event_callback': function () {
-              // Submit to Supabase after tag fires
-              fetch('https://a1apsvc.supabase.co/functions/v1/submit-quote', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  name: form.name.value,
-                  phone: form.phone.value,
-                  email: form.email.value,
-                  address: form.address.value,
-                  details: form.details.value
-                })
-              })
-              .then(response => {
-                if (response.ok) {
-                  alert('Quote request submitted successfully!');
-                  form.reset();
-                } else {
-                  alert('Submission failed. Please try again.');
-                }
-              })
-              .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-              });
+            'currency': 'USD'
+          });
+
+          fetch('https://a1apsvc.supabase.co/functions/v1/submit-quote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: form.name.value,
+              phone: form.phone.value,
+              email: form.email.value,
+              address: form.address.value,
+              details: form.details.value
+            })
+          })
+          .then(response => {
+            if (response.ok) {
+              alert('Quote request submitted successfully!');
+              form.reset();
+            } else {
+              alert('Submission failed. Please try again.');
             }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
           });
         });
       }
