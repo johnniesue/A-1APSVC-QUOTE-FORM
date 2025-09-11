@@ -5,12 +5,12 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
   const responseMessage = document.getElementById("responseMessage");
 
   const data = {
-    name: form.name.value,
-    phone: form.phone.value,
-    email: form.email.value,
-    address: form.address.value,
-    details: form.details.value
-  };
+  full_name: form.name.value,
+  phone_number: form.phone.value,
+  email: form.email.value,
+  address: form.address.value,
+  issue_types: form.details.value
+};
 
   try {
    const res = await fetch("https://zzigzylypifjokskehkn.supabase.co/rest/v1/quote_requests", {
