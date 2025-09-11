@@ -49,15 +49,12 @@
 
       <fieldset>
         <legend>Job Details</legend>
-        <label>Describe the issue: <textarea name="details" required></textarea></label>
-        <label>Upload a photo (optional): <input type="file" name="jobPhoto"></label>
-      </fieldset>
-
-      <button type="submit">Submit Request</button>
-      <p id="responseMessage" class="hidden"></p>
-    </form>
-  </div>
-
-  <script src="submit.js"></script>
-</body>
-</html>
+        <label>Describe the issue:
+          <textarea name="problem_description" required></textarea>
+        </label>
+        <label>When did the problem start?
+          <input type="date" name="problem_start_date" required>
+        </label>
+        <label>Upload a photo (optional):
+          <input type="file" name="jobPhoto" accept="image/*">
+        </label>
