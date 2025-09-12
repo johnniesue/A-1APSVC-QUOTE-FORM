@@ -3,19 +3,21 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
   const form = e.target;
   const responseMessage = document.getElementById("responseMessage");
 
- const rawDate = form.problem_start_date.value;
-const formattedDate = new Date(rawDate).toISOString().split("T")[0]; // "YYYY-MM-DD"
+  // Format the date to "YYYY-MM-DD"
+  const rawDate = form.problem_start_date.value;
+  const formattedDate = new Date(rawDate).toISOString().split("T")[0];
 
-const data = {
-  full_name: form.name.value,
-  phone_number: form.phone.value,
-  email: form.email.value,
-  address: form.address.value,
-  property_type: form.property_type.value,
-  problem_description: form.problem_description.value,
-  problem_start_date: formattedDate,
-  issue_types: JSON.stringify([form.problem_description.value])
-};
+  // Build the payload
+  const data = {
+    full_name: form.name.value,
+    phone_number: form.phone.value,
+    email: form.email.value,
+    address: form.address.value,
+    property_type: form.property_type.value,
+    problem_description: form.problem_description.value,
+    problem_start_date: formattedDate,
+    issue_types: JSON.stringify([form.problem_description.value]) // ✅ json column fix
+  };
 
   try {
     const res = await fetch("https://zzigzylypifjokskehkn.supabase.co/rest/v1/quote_requests_v2", {
@@ -34,9 +36,14 @@ const data = {
       responseMessage.style.color = "green";
       form.reset();
     } else {
-      throw new Error("Submission failed");
+      const errorText = await res.text();
+      console.error("Submission failed:", errorText);
+      responseMessage.textContent = "❌ Error submitting request. Please try again.";
+      responseMessage.classList.remove("hidden");
+      responseMessage.style.color = "red";
     }
   } catch (err) {
+    console.error("Unexpected error:", err);
     responseMessage.textContent = "❌ Error submitting request. Please try again.";
     responseMessage.classList.remove("hidden");
     responseMessage.style.color = "red";
