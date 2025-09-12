@@ -18,12 +18,12 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
     property_type: form.property_type.value,
     problem_description: form.problem_description.value,
     problem_start_date: formattedDate,
-    issue_types: [form.problem_description.value] // ✅ raw array, not stringified
+    issue_types: [form.problem_description.value] // ✅ raw array
   };
 
   try {
     const res = await fetch(
-      "https://zzigzylypifjokskehkn.supabase.co/rest/v1/quote_requests_v2",
+      "https://zzigzylypifjokskehkn.supabase.co/rest/v1/public.quote_requests_v2", // ✅ schema prefix added
       {
         method: "POST",
         headers: {
@@ -54,4 +54,3 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
     responseMessage.style.color = "red";
   }
 });
-
