@@ -1,46 +1,55 @@
-document.getElementById("quoteForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const form = e.target;
-  const responseMessage = document.getElementById("responseMessage");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A-1 Plumbing Quote Request</title>
+  <link rel="stylesheet" href="style.css">
 
-  const rawDate = form.problem_start_date.value;
-  const formattedDate = new Date(rawDate).toISOString().split("T")[0]; // "YYYY-MM-DD"
+  <!-- Google Tag Manager -->
+  <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-K82LHLQQ');
+  </script>
+  <!-- End Google Tag Manager -->
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K82LHLQQ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+  <!-- End Google Tag Manager (noscript) -->
 
-  const data = {
-    full_name: form.name.value,
-    phone_number: form.phone.value,
-    email: form.email.value,
-    address: form.address.value,
-    property_type: form.property_type.value,
-    problem_description: form.problem_description.value,
-    problem_start_date: formattedDate,
-    issue_types: [form.problem_description.value]
-  };
+  <div class="container">
+    <img src="logo.png" alt="A-1 Plumbing Logo" class="logo">
+    <h2 class="subheading">A-1 Affordable Plumbing Services</h2>
+    <h1>Request a Plumbing Quote</h1>
+    <p class="tagline">Licensed & insured. Now Serving Collin County with 30 years of experience!</p>
 
-  try {
-    const res = await fetch("https://zzigzylypifjokskehkn.supabase.co/rest/v1/quote_requests_v2", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6aWd6eWx5cGlmam9rc2tlaGtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyODEzNDAsImV4cCI6MjA2Nzg1NzM0MH0.UjSODSs-tWPmXxKkyuaSIvSutx5dCnJsMhzslbFaBUg",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6aWd6eWx5cGlmam9rc2tlaGtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyODEzNDAsImV4cCI6MjA2Nzg1NzM0MH0.UjSODSs-tWPmXxKkyuaSIvSutx5dCnJsMhzslbFaBUg"
-      },
-      body: JSON.stringify(data)
-    });
+    <form id="quoteForm">
+      <fieldset>
+        <legend>Contact Info</legend>
+        <label>Name: <input type="text" name="name" required></label>
+        <label>Phone: <input type="tel" name="phone" required></label>
+        <label>Email: <input type="email" name="email" required></label>
+        <label>Address: <input type="text" name="address"></label>
+      </fieldset>
 
-    if (res.ok) {
-      responseMessage.textContent = "✅ Quote request submitted successfully!";
-      responseMessage.classList.remove("hidden");
-      responseMessage.style.color = "green";
-      form.reset();
-    } else {
-      const errorText = await res.text();
-      console.error("Submission failed:", errorText);
-      throw new Error("Submission failed");
-    }
-  } catch (err) {
-    responseMessage.textContent = "❌ Error submitting request. Please try again.";
-    responseMessage.classList.remove("hidden");
-    responseMessage.style.color = "red";
-  }
-});
+      <fieldset>
+        <legend>Job Details</legend>
+        <label>Describe the issue: <textarea name="details" required></textarea></label>
+        <label>Upload a photo (optional): <input type="file" name="jobPhoto"></label>
+      </fieldset>
+
+      <button type="submit">Submit Request</button>
+      <p id="responseMessage" class="hidden"></p>
+    </form>
+  </div>
+
+  <script src="submit.js"></script>
+</body>
+</html>
