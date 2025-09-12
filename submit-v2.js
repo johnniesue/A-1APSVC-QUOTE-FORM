@@ -54,3 +54,4 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
     responseMessage.style.color = "red";
   }
 });
+
