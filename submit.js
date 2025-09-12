@@ -1,3 +1,5 @@
+// Force redeploy: patched issue_types for Supabase json column
+issue_types: JSON.stringify([form.problem_description.value])
 document.getElementById("quoteForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.target;
