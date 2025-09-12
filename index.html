@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>A-1 Plumbing Quote Request</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 
   <!-- Google Tag Manager -->
   <script>
@@ -25,7 +25,7 @@
   <!-- End Google Tag Manager (noscript) -->
 
   <div class="container">
-    <img src="logo.png" alt="A-1 Plumbing Logo" class="logo">
+    <img src="logo.png" alt="A-1 Plumbing Logo" class="logo" />
     <h2 class="subheading">A-1 Affordable Plumbing Services</h2>
     <h1>Request a Plumbing Quote</h1>
     <p class="tagline">Licensed & insured. Now Serving Collin County with 30 years of experience!</p>
@@ -33,16 +33,33 @@
     <form id="quoteForm">
       <fieldset>
         <legend>Contact Info</legend>
-        <label>Name: <input type="text" name="name" required></label>
-        <label>Phone: <input type="tel" name="phone" required></label>
-        <label>Email: <input type="email" name="email" required></label>
-        <label>Address: <input type="text" name="address"></label>
+        <label>Name: <input type="text" name="name" required /></label>
+        <label>Phone: <input type="tel" name="phone" required /></label>
+        <label>Email: <input type="email" name="email" required /></label>
+        <label>Address: <input type="text" name="address" required /></label>
       </fieldset>
 
       <fieldset>
         <legend>Job Details</legend>
-        <label>Describe the issue: <textarea name="details" required></textarea></label>
-        <label>Upload a photo (optional): <input type="file" name="jobPhoto"></label>
+        <label>Property Type:
+          <select name="property_type" required>
+            <option value="">Select one</option>
+            <option value="Residential">Residential</option>
+            <option value="Commercial">Commercial</option>
+          </select>
+        </label>
+
+        <label>Describe the issue:
+          <textarea name="problem_description" required></textarea>
+        </label>
+
+        <label>When did the issue start?
+          <input type="date" name="problem_start_date" required />
+        </label>
+
+        <label>Upload a photo (optional):
+          <input type="file" name="jobPhoto" />
+        </label>
       </fieldset>
 
       <button type="submit">Submit Request</button>
