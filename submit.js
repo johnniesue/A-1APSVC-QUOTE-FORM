@@ -14,7 +14,7 @@ const data = {
   property_type: form.property_type.value,
   problem_description: form.problem_description.value,
   problem_start_date: formattedDate,
-  issue_types: [form.problem_description.value]
+  issue_types: JSON.stringify([form.problem_description.value])
 };
 
   try {
