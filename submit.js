@@ -3,16 +3,19 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
   const form = e.target;
   const responseMessage = document.getElementById("responseMessage");
 
-  const data = {
-    full_name: form.name.value,
-    phone_number: form.phone.value,
-    email: form.email.value,
-    address: form.address.value,
-    property_type: form.property_type.value,
-    problem_description: form.problem_description.value,
-    problem_start_date: form.problem_start_date.value,
-    issue_types: [form.problem_description.value]
-  };
+ const rawDate = form.problem_start_date.value;
+const formattedDate = new Date(rawDate).toISOString().split("T")[0]; // "YYYY-MM-DD"
+
+const data = {
+  full_name: form.name.value,
+  phone_number: form.phone.value,
+  email: form.email.value,
+  address: form.address.value,
+  property_type: form.property_type.value,
+  problem_description: form.problem_description.value,
+  problem_start_date: formattedDate,
+  issue_types: [form.problem_description.value]
+};
 
   try {
     const res = await fetch("https://zzigzylypifjokskehkn.supabase.co/rest/v1/quote_requests_v2", {
