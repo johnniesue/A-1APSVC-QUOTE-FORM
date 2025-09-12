@@ -16,7 +16,7 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
     property_type: form.property_type.value,
     problem_description: form.problem_description.value,
     problem_start_date: formattedDate,
-    issue_types: JSON.stringify([form.problem_description.value]) // ✅ json column fix
+    issue_types: JSON.stringify([form.problem_description.value])
   };
 
   try {
