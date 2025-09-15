@@ -23,7 +23,7 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
 
   try {
     const res = await fetch(
-      "https://zzigzylypifjokskehkn.supabase.co/rest/v1/quote_requests_v2", // ✅ no schema prefix
+      "https://zzigzylypifjokskehkn.supabase.co/rest/v1/quote_requests_v2",
       {
         method: "POST",
         headers: {
