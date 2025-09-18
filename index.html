@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Request a Plumbing Quote | A-1 Affordable Plumbing Services</title>
-
-  <!-- Google tag (gtag.js) -->
+  <title>A-1 Plumbing Quote Request</title>
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-10849700032"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -13,124 +11,116 @@
     gtag('js', new Date());
     gtag('config', 'AW-10849700032');
   </script>
-
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f8fb;
-      padding: 40px;
-      margin: 0;
-    }
-
-    .form-container {
-      background: #ffffff;
-      max-width: 600px;
-      margin: auto;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-    }
-
-    h2 {
-      text-align: center;
-      color: #0074b7;
-      margin-bottom: 25px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 12px;
-      color: #333;
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-sizing: border-box;
-    }
-
-    button {
-      width: 100%;
-      background-color: #0074b7;
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #005f99;
-    }
+    body { font-family: Arial, sans-serif; padding: 2rem; }
+    .hidden { display: none; }
+    form { max-width: 600px; margin: auto; }
+    label { display: block; margin-top: 1rem; }
+    input, textarea, select { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
+    button { margin-top: 1.5rem; padding: 0.75rem 1.5rem; }
+    #responseMessage { margin-top: 1rem; font-weight: bold; }
   </style>
 </head>
-
 <body>
-  <div class="form-container">
-    <h2>Request a Plumbing Quote</h2>
-    <form id="quoteForm">
-      <label for="name">Name:</label>
-      <input type="text" id="name" name="name" required />
+  <h1>Request a Plumbing Quote</h1>
+  <form id="quoteForm">
+    <fieldset>
+      <label>Full Name:
+        <input type="text" name="name" required />
+      </label>
+      <label>Phone Number:
+        <input type="tel" name="phone" required />
+      </label>
+      <label>Email:
+        <input type="email" name="email" required />
+      </label>
+      <label>Address:
+        <input type="text" name="address" required />
+      </label>
+      <label>Property Type:
+        <select name="property_type" required>
+          <option value="">Select</option>
+          <option value="Residential">Residential</option>
+          <option value="Commercial">Commercial</option>
+        </select>
+      </label>
+      <label>Describe the issue:
+        <textarea name="problem_description" required></textarea>
+      </label>
+      <label>When did the issue start?
+        <input type="date" name="problem_start_date" required />
+      </label>
+      <label>Upload a photo (optional):
+        <input type="file" name="jobPhoto" />
+      </label>
+    </fieldset>
 
-      <label for="phone">Phone Number:</label>
-      <input type="tel" id="phone" name="phone" required />
+    <!-- Turnstile CAPTCHA -->
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAAB1YzAtl3RUnnoT9" data-theme="light"></div>
 
-      <label for="email">Email Address:</label>
-      <input type="email" id="email" name="email" required />
-
-      <label for="address">Service Address:</label>
-      <input type="text" id="address" name="address" required />
-
-      <label for="details">Job Details:</label>
-      <textarea id="details" name="details" rows="4" required></textarea>
-
-      <button type="submit">Submit Request</button>
-    </form>
-  </div>
+    <button type="submit">Submit Request</button>
+    <p id="responseMessage" class="hidden"></p>
+  </form>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const form = document.getElementById('quoteForm');
-      if (form) {
-        form.addEventListener('submit', function (e) {
-          e.preventDefault();
+      const responseMessage = document.getElementById('responseMessage');
 
-          gtag('event', 'conversion', {
-            'send_to': 'AW-10849700032/2nYgCNmZqZgZEOmZxZMo',
-            'value': 1.0,
-            'currency': 'USD'
-          });
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
 
-          fetch('https://a1apsvc.supabase.co/functions/v1/submit-quote', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: form.name.value,
-              phone: form.phone.value,
-              email: form.email.value,
-              address: form.address.value,
-              details: form.details.value
-            })
-          })
-          .then(response => {
-            if (response.ok) {
-              alert('Quote request submitted successfully!');
-              form.reset();
-            } else {
-              alert('Submission failed. Please try again.');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-          });
+        gtag('event', 'conversion', {
+          send_to: 'AW-10849700032/2nYgCNmZqZgZEOmZxZMo',
+          value: 1.0,
+          currency: 'USD'
         });
-      }
+
+        const formattedDate = form.problem_start_date.value
+          ? new Date(form.problem_start_date.value).toISOString().split("T")[0]
+          : null;
+
+        const captchaToken = document.querySelector('[name="cf-turnstile-response"]')?.value || "";
+
+        const payload = {
+          full_name: form.name.value,
+          phone_number: form.phone.value,
+          email: form.email.value,
+          address: form.address.value,
+          property_type: form.property_type.value,
+          problem_description: form.problem_description.value,
+          problem_start_date: formattedDate,
+          issue_types: [form.problem_description.value],
+          captcha_token: captchaToken
+        };
+
+        try {
+          const res = await fetch("https://zzigzylypifjokskehkn.supabase.co/functions/v1/send-quote", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          if (res.ok) {
+            responseMessage.textContent = "✅ Quote request submitted successfully!";
+            responseMessage.classList.remove("hidden");
+            responseMessage.style.color = "green";
+            form.reset();
+          } else {
+            const errorText = await res.text();
+            console.error("Submission failed:", errorText);
+            responseMessage.textContent = "❌ Error submitting request. Please try again.";
+            responseMessage.classList.remove("hidden");
+            responseMessage.style.color = "red";
+          }
+        } catch (err) {
+          console.error("Unexpected error:", err);
+          responseMessage.textContent = "❌ Error submitting request. Please try again.";
+          responseMessage.classList.remove("hidden");
+          responseMessage.style.color = "red";
+        }
+      });
     });
   </script>
 </body>
