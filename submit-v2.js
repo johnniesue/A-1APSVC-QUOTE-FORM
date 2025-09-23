@@ -1,48 +1,68 @@
-document.getElementById("quoteForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
+// submit-v2.js
+console.log('Loaded submit-v2.js');
 
-  const form = e.target;
-  const responseMessage = document.getElementById("responseMessage");
+document
+  .getElementById('quoteForm')
+  .addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  const rawDate = form.problem_start_date.value;
-  const formattedDate = rawDate ? new Date(rawDate).toISOString().split("T")[0] : null;
+    const form = e.target;
+    const responseMessage = document.getElementById('responseMessage');
 
-  const data = {
-    full_name: form.name.value,
-    phone_number: form.phone.value,
-    email: form.email.value,
-    address: form.address.value,
-    property_type: form.property_type.value,
-    problem_description: form.problem_description.value,
-    problem_start_date: formattedDate,
-    issue_types: [form.problem_description.value]
-  };
+    // 1) Format the date as YYYY-MM-DD or null
+    const rawDate = form.problem_start_date.value;
+    const formattedDate = rawDate
+      ? new Date(rawDate).toISOString().split('T')[0]
+      : null;
 
-  try {
-    const res = await fetch("https://zzigzylypifjokskehkn.supabase.co/functions/v1/send-quote", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
+    // 2) Build payload
+    const payload = {
+      full_name:           form.name.value,
+      phone_number:        form.phone.value,
+      email:               form.email.value,
+      address:             form.address.value,
+      property_type:       form.property_type.value,
+      problem_description: form.problem_description.value,
+      problem_start_date:  formattedDate,
+      issue_types:         [form.problem_description.value]
+    };
 
-    if (res.ok) {
-      responseMessage.textContent = "✅ Quote request submitted successfully!";
-      responseMessage.classList.remove("hidden");
-      responseMessage.style.color = "green";
+    try {
+      // 3) POST to your deployed Edge Function
+      const res = await fetch(
+        'https://zzigzylypifjokskehkn.functions.supabase.co/send-quote-email',
+        {
+          method:  'POST',
+          mode:    'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(payload)
+        }
+      );
+
+      // 4) Surface HTTP-level failures
+      const text = await res.text();
+      if (!res.ok) {
+        console.error('HTTP Error:', res.status, text);
+        responseMessage.textContent =
+          '❌ Error submitting request. Please try again.';
+        responseMessage.style.color = 'red';
+        responseMessage.classList.remove('hidden');
+        return;
+      }
+
+      // 5) Success path
+      console.log('Submission succeeded:', text);
+      responseMessage.textContent =
+        '✅ Quote request submitted successfully!';
+      responseMessage.style.color = 'green';
+      responseMessage.classList.remove('hidden');
       form.reset();
-    } else {
-      const errorText = await res.text();
-      console.error("Submission failed:", errorText);
-      responseMessage.textContent = "❌ Error submitting request. Please try again.";
-      responseMessage.classList.remove("hidden");
-      responseMessage.style.color = "red";
+    } catch (err) {
+      // 6) Network / CORS failures
+      console.error('Network error:', err);
+      responseMessage.textContent =
+        '❌ Network error. Please try again.';
+      responseMessage.style.color = 'red';
+      responseMessage.classList.remove('hidden');
     }
-  } catch (err) {
-    console.error("Unexpected error:", err);
-    responseMessage.textContent = "❌ Error submitting request. Please try again.";
-    responseMessage.classList.remove("hidden");
-    responseMessage.style.color = "red";
-  }
-});
+  });
