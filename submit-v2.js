@@ -19,7 +19,7 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
   };
 
   try {
-    const res = await fetch("https://zzigzylypifjokskehkn.supabase.co/functions/v1/send-quote", {
+    const res = await fetch("https://zzigzylypifjokskehkn.supabase.co/functions/v1/send-quote-email", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
