@@ -27,15 +27,16 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
       body: JSON.stringify(data)
     });
 
-    if (res.ok) {
+    const result = await res.json();
+
+    if (res.ok && result.success) {
       responseMessage.textContent = "✅ Quote request submitted successfully!";
       responseMessage.classList.remove("hidden");
       responseMessage.style.color = "green";
       form.reset();
     } else {
-      const errorText = await res.text();
-      console.error("Submission failed:", errorText);
-      responseMessage.textContent = "❌ Error submitting request. Please try again.";
+      console.error("Submission failed:", result);
+      responseMessage.textContent = result.message || "❌ Error submitting request. Please try again.";
       responseMessage.classList.remove("hidden");
       responseMessage.style.color = "red";
     }
