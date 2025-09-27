@@ -27,7 +27,20 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
       body: JSON.stringify(data)
     });
 
-    const result = await res.json();
+    let result;
+    let isJson = res.headers.get("content-type") && res.headers.get("content-type").includes("application/json");
+    if (isJson) {
+      try {
+        result = await res.json();
+      } catch (jsonErr) {
+        console.error("Failed to parse JSON response:", jsonErr);
+        result = {};
+      }
+    } else {
+      // fallback: get text response
+      const text = await res.text();
+      result = { success: false, message: text };
+    }
 
     if (res.ok && result.success) {
       responseMessage.textContent = "✅ Quote request submitted successfully!";
