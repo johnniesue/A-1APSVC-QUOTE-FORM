@@ -49,7 +49,9 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
       form.reset();
     } else {
       console.error("Submission failed:", result);
-      responseMessage.textContent = result.message || "❌ Error submitting request. Please try again.";
+      responseMessage.textContent =
+        (result && typeof result === "object" && "message" in result && result.message)
+          || "❌ Error submitting request. Please try again.";
       responseMessage.classList.remove("hidden");
       responseMessage.style.color = "red";
     }
