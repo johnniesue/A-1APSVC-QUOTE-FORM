@@ -15,15 +15,12 @@
     })(window,document,'script','dataLayer','GTM-K82LHLQQ');
   </script>
   <!-- End Google Tag Manager -->
-
-  <!-- Cloudflare Turnstile -->
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
   <!-- Google Tag Manager (noscript) -->
   <noscript>
     <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K82LHLQQ"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe>
+            height="0" width="0" style="display:none;visibility:hidden"></iframe>
   </noscript>
   <!-- End Google Tag Manager (noscript) -->
 
@@ -51,75 +48,23 @@
             <option value="Commercial">Commercial</option>
           </select>
         </label>
-
         <label>Describe the issue:
           <textarea name="problem_description" required></textarea>
         </label>
-
         <label>When did the issue start?
           <input type="date" name="problem_start_date" required />
         </label>
-
         <label>Upload a photo (optional):
           <input type="file" name="jobPhoto" />
         </label>
       </fieldset>
-
-      <!-- Turnstile CAPTCHA -->
-      <div class="cf-turnstile" data-sitekey="0x4AAAAAAB1YzAtl3RUnnoT9" data-theme="light"></div>
 
       <button type="submit">Submit Request</button>
       <p id="responseMessage" class="hidden"></p>
     </form>
   </div>
 
-  <script>
-    document.getElementById("quoteForm").addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const form = e.target;
-      const formattedDate = form.problem_start_date.value;
-
-      const captchaToken = document.querySelector('[name="cf-turnstile-response"]').value;
-
-      const payload = {
-        full_name: form.name.value,
-        phone_number: form.phone.value,
-        email: form.email.value,
-        address: form.address.value,
-        property_type: form.property_type.value,
-        problem_description: form.problem_description.value,
-        problem_start_date: formattedDate,
-        issue_types: [form.problem_description.value],
-        captchaToken
-      };
-
-      try {
-        const res = await fetch("https://zzigzylypifjokskehkn.supabase.co/functions/v1/quote-request-submit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await res.json();
-        const messageEl = document.getElementById("responseMessage");
-        if (res.ok) {
-          messageEl.textContent = "Quote request submitted successfully!";
-          messageEl.classList.remove("hidden");
-          messageEl.classList.add("success");
-          form.reset();
-        } else {
-          messageEl.textContent = result.error || "Submission failed.";
-          messageEl.classList.remove("hidden");
-          messageEl.classList.add("error");
-        }
-      } catch (err) {
-        console.error("Submission error:", err);
-        const messageEl = document.getElementById("responseMessage");
-        messageEl.textContent = "Network error. Please try again.";
-        messageEl.classList.remove("hidden");
-        messageEl.classList.add("error");
-      }
-    });
-  </script>
+  <!-- Use external JS file instead of inline script -->
+  <script src="submit-v2.js"></script>
 </body>
 </html>
