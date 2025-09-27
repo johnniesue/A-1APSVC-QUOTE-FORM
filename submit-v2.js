@@ -28,7 +28,8 @@ document.getElementById("quoteForm").addEventListener("submit", async (e) => {
     });
 
     let result;
-    let isJson = res.headers.get("content-type") && res.headers.get("content-type").includes("application/json");
+    const contentType = res.headers.get("content-type");
+    let isJson = contentType && contentType.includes("application/json");
     if (isJson) {
       try {
         result = await res.json();
