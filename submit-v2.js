@@ -1,55 +1,81 @@
-document.getElementById("quoteForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
+// A-1 APSVC Quote Form Submission Script
+// Uses Supabase Edge Function (SendGrid mailer)
 
-  const form = e.target;
+// Update this if your function name or region changes
+const ENDPOINT =
+  "https://zzigzylypifjokskehkn.supabase.co/functions/v1/send-quote";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("quoteForm");
   const responseMessage = document.getElementById("responseMessage");
+  const submitBtn = form.querySelector("button[type='submit']");
 
-  // Format date safely
-  const rawDate = form.problem_start_date.value;
-  const formattedDate = rawDate
-    ? new Date(rawDate).toISOString().split("T")[0]
-    : null;
-
-  // Build payload
-  const data = {
-    full_name: form.name.value.trim(),
-    phone_number: form.phone.value.trim(),
-    email: form.email.value.trim(),
-    address: form.address.value.trim(),
-    property_type: form.property_type.value,
-    problem_description: form.problem_description.value.trim(),
-    problem_start_date: formattedDate,
-    issue_types: [form.problem_description.value.trim()],
-  };
-
-  try {
-    const res = await fetch("https://zzigzylypifjokskehkn.supabase.co/functions/v1/send-quote", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
-
-    if (res.ok) {
-      responseMessage.textContent = "✅ Quote request submitted successfully!";
-      responseMessage.classList.remove("hidden");
-      responseMessage.style.color = "green";
-      form.reset();
-    } else {
-      const errorText = await res.text();
-      console.error("Submission failed:", errorText);
-      responseMessage.textContent =
-        "❌ Error submitting request. Please try again.";
-      responseMessage.classList.remove("hidden");
-      responseMessage.style.color = "red";
-    }
-  } catch (err) {
-    console.error("Unexpected error:", err);
-    responseMessage.textContent =
-      "❌ Network error. Please check your connection and try again.";
+  async function handleSubmit(e) {
+    e.preventDefault();
+    responseMessage.textContent = "";
     responseMessage.classList.remove("hidden");
-    responseMessage.style.color = "red";
-  }
-});
 
+    // Disable button to prevent double-clicks
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending…";
+
+    // Format date safely
+    const rawDate = form.problem_start_date?.value;
+    const formattedDate = rawDate
+      ? new Date(rawDate).toISOString().split("T")[0]
+      : null;
+
+    // Build payload
+    const data = {
+      full_name: form.name.value.trim(),
+      phone_number: form.phone.value.trim(),
+      email: form.email.value.trim(),
+      address: form.address.value.trim(),
+      property_type: form.property_type?.value || "",
+      problem_description: form.problem_description.value.trim(),
+      problem_start_date: formattedDate,
+      issue_types: [form.problem_description.value.trim()],
+    };
+
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      let msgColor = "red";
+      let msgText;
+
+      if (res.ok) {
+        msgText = "✅ Quote request submitted successfully!";
+        msgColor = "green";
+        form.reset();
+      } else {
+        const errText = await res.text();
+        console.error("Submission failed:", errText);
+        msgText = "❌ Error submitting request. Please try again.";
+      }
+
+      responseMessage.textContent = msgText;
+      responseMessage.style.color = msgColor;
+      responseMessage.classList.remove("hidden");
+      responseMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      responseMessage.textContent =
+        "❌ Network error. Please check your connection and try again.";
+      responseMessage.style.color = "red";
+      responseMessage.classList.remove("hidden");
+      responseMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Request Quote";
+    }
+  }
+
+  form.addEventListener("submit", handleSubmit);
+});
