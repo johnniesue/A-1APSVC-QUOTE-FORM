@@ -1,70 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A-1 Plumbing Quote Request</title>
-  <link rel="stylesheet" href="style.css" />
+// A-1 Plumbing Quote Form submission
+// Connects to Supabase Edge Function + SendGrid
+// Version: 2025-10
 
-  <!-- Google Tag Manager -->
-  <script>
-    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-K82LHLQQ');
-  </script>
-  <!-- End Google Tag Manager -->
-</head>
-<body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript>
-    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K82LHLQQ"
-            height="0" width="0" style="display:none;visibility:hidden"></iframe>
-  </noscript>
-  <!-- End Google Tag Manager (noscript) -->
+const ENDPOINT = "https://zzigzylypifjokskehkn.supabase.co/functions/v1/send-quote";
 
-  <div class="container">
-    <img src="logo.png" alt="A-1 Plumbing Logo" class="logo" />
-    <h2 class="subheading">A-1 Affordable Plumbing Services</h2>
-    <h1>Request a Plumbing Quote</h1>
-    <p class="tagline">Licensed & insured. Now Serving Collin County with 30 years of experience!</p>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("quoteForm");
+  const responseMessage = document.getElementById("responseMessage");
+  const submitBtn = form.querySelector("button[type='submit']");
 
-    <form id="quoteForm">
-      <fieldset>
-        <legend>Contact Info</legend>
-        <label>Name: <input type="text" name="name" required /></label>
-        <label>Phone: <input type="tel" name="phone" required /></label>
-        <label>Email: <input type="email" name="email" required /></label>
-        <label>Address: <input type="text" name="address" required /></label>
-      </fieldset>
+  // Reusable helper to show messages
+  function showMessage(text, color = "green") {
+    responseMessage.textContent = text;
+    responseMessage.style.color = color;
+    responseMessage.classList.remove("hidden");
+    responseMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 
-      <fieldset>
-        <legend>Job Details</legend>
-        <label>Property Type:
-          <select name="property_type" required>
-            <option value="">Select one</option>
-            <option value="Residential">Residential</option>
-            <option value="Commercial">Commercial</option>
-          </select>
-        </label>
-        <label>Describe the issue:
-          <textarea name="problem_description" required></textarea>
-        </label>
-        <label>When did the issue start?
-          <input type="date" name="problem_start_date" required />
-        </label>
-        <label>Upload a photo (optional):
-          <input type="file" name="jobPhoto" />
-        </label>
-      </fieldset>
+  async function handleSubmit(e) {
+    e.preventDefault();
+    showMessage("", ""); // clear old messages
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending...";
 
-      <button type="submit">Submit Request</button>
-      <p id="responseMessage" class="hidden"></p>
-    </form>
-  </div>
+    try {
+      // Safely format date
+      const rawDate = form.problem_start_date.value;
+      const formattedDate = rawDate
+        ? new Date(rawDate).toISOString().split("T")[0]
+        : null;
 
-  <!-- Use external JS file instead of inline script -->
-  <script src="submit-v2.js"></script>
-</body>
-</html>
+      // Build payload matching backend expectations
+      const data = {
+        full_name: form.name.value.trim(),
+        phone_number: form.phone.value.trim(),
+        email: form.email.value.trim(),
+        address: form.address.value.trim(),
+        property_type: form.property_type.value,
+        problem_description: form.problem_description.value.trim(),
+        problem_start_date: formattedDate,
+        issue_types: [form.problem_description.value.trim()],
+      };
+
+      // Prepare request
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        mode: "cors",
+        body: JSON.stringify(data),
+      });
+
+      // Handle response
+      const rawText = await res.text();
+      let body;
+      try {
+        body = JSON.parse(rawText);
+      } catch {
+        body = { message: rawText };
+      }
+
+      if (res.ok) {
+        showMessage("✅ Quote request submitted successfully!", "green");
+        form.reset();
+      } else {
+        console.error("Submission failed:", body);
+        const msg =
+          body?.error ||
+          body?.message ||
+          "❌ Error submitting request. Please try again.";
+        showMessage(msg, "red");
+      }
+    } catch (err) {
+      console.error("Network or unexpected error:", err);
+      showMessage(
+        "❌ Network error. Please check your connection and try again.",
+        "red"
+      );
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Request";
+    }
+  }
+
+  form.addEventListener("submit", handleSubmit);
+});
