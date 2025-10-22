@@ -3,7 +3,7 @@
 
 // Update this if your function name or region changes
 const ENDPOINT =
-  "https://zzigzylypifjokskehkn.supabase.co/functions/v1/send-quote";
+  "https://zzigzylypifjokskehkn.supabase.co/functions/v1/send-quote-email";
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("quoteForm");
