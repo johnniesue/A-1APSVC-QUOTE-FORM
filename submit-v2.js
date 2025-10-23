@@ -38,14 +38,15 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      const res = await fetch(ENDPOINT, {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+     const res = await fetch(ENDPOINT, {
+  method: "POST",
+  mode: "cors",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + "YOUR_SUPABASE_ANON_KEY"
+  },
+  body: JSON.stringify(data)
+});
 
       let msgColor = "red";
       let msgText;
