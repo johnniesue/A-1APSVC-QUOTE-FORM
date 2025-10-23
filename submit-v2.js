@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   mode: "cors",
   headers: {
     "Content-Type": "application/json",
-    "Authorization": "Bearer " + "YOUR_SUPABASE_ANON_KEY"
+    "Authorization": "Bearer " + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6aWd6eWx5cGlmam9rc2tlaGtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyODEzNDAsImV4cCI6MjA2Nzg1NzM0MH0.UjSODSs-tWPmXxKkyuaSIvSutx5dCnJsMhzslbFaBUg"
   },
   body: JSON.stringify(data)
 });
