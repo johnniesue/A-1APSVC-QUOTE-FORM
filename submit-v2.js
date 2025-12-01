@@ -1,7 +1,6 @@
 // A-1 APSVC Quote Form Submission Script
 // Uses Supabase Edge Function (MailerSend mailer)
 
-// Update this if your function name or region changes
 const ENDPOINT =
   "https://zzigzylypifjokskehkn.supabase.co/functions/v1/send-quote-email";
 
@@ -13,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function handleSubmit(e) {
     e.preventDefault();
     responseMessage.textContent = "";
-    responseMessage.classList.remove("hidden");
+    responseMessage.className = "hidden"; // reset classes
 
     // Disable button to prevent double-clicks
     submitBtn.disabled = true;
@@ -43,39 +42,32 @@ document.addEventListener("DOMContentLoaded", () => {
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
-          // IMPORTANT: Replace with a valid Supabase anon/public key or secret
           "Authorization":
             "Bearer " +
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6aWd6eWx5cGlmam9rc2tlaGtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyODEzNDAsImV4cCI6MjA2Nzg1NzM0MH0.UjSODSs-tWPmXxKkyuaSIvSutx5dCnJsMhzslbFaBUg",
+            "YOUR_SUPABASE_ANON_KEY_OR_JWT", // replace with valid key
         },
         body: JSON.stringify(data),
       });
 
-      let msgColor = "red";
-      let msgText;
-
       if (res.ok) {
-        msgText = "✅ Quote request submitted successfully!";
-        msgColor = "green";
+        responseMessage.textContent = "✅ Quote request submitted successfully!";
+        responseMessage.className = "success";
         form.reset();
       } else {
         const errText = await res.text();
         console.error("Submission failed:", errText);
-        msgText = "❌ Error submitting request. Please try again.";
+        responseMessage.textContent =
+          "❌ Error submitting request. Please try again.";
+        responseMessage.className = "error";
       }
-
-      responseMessage.textContent = msgText;
-      responseMessage.style.color = msgColor;
-      responseMessage.classList.remove("hidden");
-      responseMessage.scrollIntoView({ behavior: "smooth", block: "center" });
     } catch (err) {
       console.error("Unexpected error:", err);
       responseMessage.textContent =
         "❌ Network error. Please check your connection and try again.";
-      responseMessage.style.color = "red";
+      responseMessage.className = "error";
+    } finally {
       responseMessage.classList.remove("hidden");
       responseMessage.scrollIntoView({ behavior: "smooth", block: "center" });
-    } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Request Quote";
     }
