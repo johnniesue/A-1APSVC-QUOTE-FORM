@@ -1,5 +1,5 @@
 // A-1 APSVC Quote Form Submission Script
-// Uses Supabase Edge Function (SendGrid mailer)
+// Uses Supabase Edge Function (MailerSend mailer)
 
 // Update this if your function name or region changes
 const ENDPOINT =
@@ -38,15 +38,18 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-     const res = await fetch(ENDPOINT, {
-  method: "POST",
-  mode: "cors",
-  headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer " + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6aWd6eWx5cGlmam9rc2tlaGtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyODEzNDAsImV4cCI6MjA2Nzg1NzM0MH0.UjSODSs-tWPmXxKkyuaSIvSutx5dCnJsMhzslbFaBUg"
-  },
-  body: JSON.stringify(data)
-});
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+          // IMPORTANT: Replace with a valid Supabase anon/public key or secret
+          "Authorization":
+            "Bearer " +
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6aWd6eWx5cGlmam9rc2tlaGtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyODEzNDAsImV4cCI6MjA2Nzg1NzM0MH0.UjSODSs-tWPmXxKkyuaSIvSutx5dCnJsMhzslbFaBUg",
+        },
+        body: JSON.stringify(data),
+      });
 
       let msgColor = "red";
       let msgText;
