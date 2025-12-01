@@ -31,37 +31,43 @@
     <p class="tagline">Licensed & insured. Now Serving Collin County with 30 years of experience!</p>
 
     <form id="quoteForm">
-      <fieldset>
-        <legend>Contact Info</legend>
-        <label>Name: <input type="text" name="name" required /></label>
-        <label>Phone: <input type="tel" name="phone" required /></label>
-        <label>Email: <input type="email" name="email" required /></label>
-        <label>Address: <input type="text" name="address" required /></label>
-      </fieldset>
+  <fieldset>
+    <legend>Contact Info</legend>
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required />
 
-      <fieldset>
-        <legend>Job Details</legend>
-        <label>Property Type:
-          <select name="property_type" required>
-            <option value="">Select one</option>
-            <option value="Residential">Residential</option>
-            <option value="Commercial">Commercial</option>
-          </select>
-        </label>
-        <label>Describe the issue:
-          <textarea name="problem_description" required></textarea>
-        </label>
-        <label>When did the issue start?
-          <input type="date" name="problem_start_date" required />
-        </label>
-        <label>Upload a photo (optional):
-          <input type="file" name="jobPhoto" />
-        </label>
-      </fieldset>
+    <label for="phone">Phone:</label>
+    <input type="tel" id="phone" name="phone" required />
 
-      <button type="submit">Submit Request</button>
-      <p id="responseMessage" class="hidden"></p>
-    </form>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required />
+
+    <label for="address">Address:</label>
+    <input type="text" id="address" name="address" required />
+  </fieldset>
+
+  <fieldset>
+    <legend>Job Details</legend>
+    <label for="property_type">Property Type:</label>
+    <select id="property_type" name="property_type" required>
+      <option value="">Select one</option>
+      <option value="Residential">Residential</option>
+      <option value="Commercial">Commercial</option>
+    </select>
+
+    <label for="problem_description">Describe the issue:</label>
+    <textarea id="problem_description" name="problem_description" required></textarea>
+
+    <label for="problem_start_date">When did the issue start?</label>
+    <input type="date" id="problem_start_date" name="problem_start_date" required />
+
+    <label for="jobPhoto">Upload a photo (optional):</label>
+    <input type="file" id="jobPhoto" name="jobPhoto" />
+  </fieldset>
+
+  <button type="submit">Request Quote</button>
+  <p id="responseMessage" class="hidden"></p>
+</form>
   </div>
 
   <!-- Script: keep last, right before </body> -->
