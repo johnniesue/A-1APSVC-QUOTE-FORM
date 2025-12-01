@@ -132,11 +132,23 @@ button[type="submit"]:active { transform: translateY(1px); }
 button[disabled] { opacity: .65; cursor: not-allowed; }
 
 #responseMessage {
-  margin: 0.5rem 0 0;
-  font-weight: 700;
-  /* color is set by JS on success/error; set a neutral default: */
-  color: #334155;
+  margin-top: 1em;
+  font-weight: bold;
+  font-size: 1rem;
 }
+
+.hidden {
+  display: none;
+}
+
+#responseMessage.success {
+  color: green;
+}
+
+#responseMessage.error {
+  color: red;
+}
+
 
 /* ===== Responsive ===== */
 @media (max-width: 720px) {
