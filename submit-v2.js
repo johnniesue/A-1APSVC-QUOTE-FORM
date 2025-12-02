@@ -4,6 +4,9 @@
 const ENDPOINT =
   "https://zzigzylypifjokskehkn.supabase.co/functions/v1/send-quote-email";
 
+// Replace with your actual anon key (safe for public use)
+const SUPABASE_ANON_KEY = "sb_publishable_ei0eWX62jrS8MMq7odV4iQ_IW-9yqG6";
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("quoteForm");
   const responseMessage = document.getElementById("responseMessage");
@@ -40,12 +43,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(ENDPOINT, {
         method: "POST",
         mode: "cors",
-       headers: {
-  "Content-Type": "application/json",
-  "Authorization": "Bearer sb_publishable_ei0eWX62jrS8MMq7odV4iQ_IW-9yqG6"
-},
-body: JSON.stringify(data),
-
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_ANON_KEY, // ✅ use anon key here
+        },
+        body: JSON.stringify(data),
       });
 
       if (res.ok) {
