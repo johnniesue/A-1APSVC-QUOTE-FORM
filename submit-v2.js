@@ -1,8 +1,7 @@
 // A-1 APSVC Quote Form Submission Script
 // Uses Supabase Edge Function (MailerSend mailer)
 
-const ENDPOINT =
-  "https://zzigzylypifjokskehkn.supabase.co/functions/v1/send-quote-email";
+const ENDPOINT = "https://zzigzylypifjokskehkn.functions.supabase.co/send-quote-email";
 
 // Replace with your actual anon key (safe for public use)
 const SUPABASE_ANON_KEY = "sb_publishable_ei0eWX62jrS8MMq7odV4iQ_IW-9yqG6";
