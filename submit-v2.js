@@ -1,10 +1,8 @@
 // A-1 APSVC Quote Form Submission Script
-// Uses Supabase Edge Function (MailerSend mailer)
+// Uses Supabase Edge Function (Resend mailer)
 
-const ENDPOINT = "https://zzigzylypifjokskehkn.functions.supabase.co/send-quote-email";
-
-// Replace with your actual anon key (safe for public use)
-const SUPABASE_ANON_KEY = "sb_publishable_ei0eWX62jrS8MMq7odV4iQ_IW-9yqG6";
+const ENDPOINT =
+  "https://zzigzylypifjokskehkn.functions.supabase.co/send-quote-email";
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("quoteForm");
@@ -14,19 +12,16 @@ document.addEventListener("DOMContentLoaded", () => {
   async function handleSubmit(e) {
     e.preventDefault();
     responseMessage.textContent = "";
-    responseMessage.className = "hidden"; // reset classes
+    responseMessage.className = "hidden";
 
-    // Disable button to prevent double-clicks
     submitBtn.disabled = true;
     submitBtn.textContent = "Sending…";
 
-    // Format date safely
     const rawDate = form.problem_start_date?.value;
     const formattedDate = rawDate
       ? new Date(rawDate).toISOString().split("T")[0]
       : null;
 
-    // Build payload
     const data = {
       full_name: form.name.value.trim(),
       phone_number: form.phone.value.trim(),
@@ -44,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
-          "apikey": SUPABASE_ANON_KEY, // ✅ use anon key here
+          "Authorization": "Bearer sb_publishable_ei0eWX62jrS8MMq7odV4iQ_IW-9yqG6"
         },
         body: JSON.stringify(data),
       });
