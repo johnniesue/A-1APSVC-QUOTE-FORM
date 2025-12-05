@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer sb_publishable_ei0eWX62jrS8MMq7odV4iQ_IW-9yqG6"
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6aWd6eWx5cGlmam9rc2tlaGtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyODEzNDAsImV4cCI6MjA2Nzg1NzM0MH0.UjSODSs-tWPmXxKkyuaSIvSutx5dCnJsMhzslbFaBUg"
         },
         body: JSON.stringify(data),
       });
