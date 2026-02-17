@@ -187,3 +187,73 @@ button:active {
     font-size: 18px;
   }
 }
+
+.review-line {
+  font-weight: 600;
+  color: #f4b400;
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+.license-line {
+  font-size: 14px;
+  color: #555;
+  margin-top: 5px;
+}
+
+.call-now {
+  margin-top: 15px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.call-now a {
+  color: #0b5fa5;
+  text-decoration: none;
+}
+
+.call-now a:hover {
+  text-decoration: underline;
+}
+
+.form-note {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #555;
+}
+
+.trust-badges {
+  margin-top: 20px;
+  font-size: 15px;
+  color: #0b5fa5;
+  font-weight: 500;
+}
+
+/* Sticky Call Bar */
+.sticky-call {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sticky-call {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #0b5fa5;
+    text-align: center;
+    padding: 14px 0;
+    z-index: 999;
+  }
+
+  .sticky-call a {
+    color: #fff;
+    font-weight: 600;
+    font-size: 18px;
+    text-decoration: none;
+  }
+
+  body {
+    padding-bottom: 70px;
+  }
+}
