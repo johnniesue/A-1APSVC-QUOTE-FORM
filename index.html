@@ -4,8 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Request a Plumbing Quote | A-1 Affordable Plumbing Services</title>
-  <meta name="description" content="Request a fast, free plumbing quote from A-1 Affordable Plumbing Services. Licensed & insured Master Plumber serving Collin County, TX. Call or text (469) 900-5194." />
-
+  <meta name="description" content="Request a fast, free plumbing quote from A-1 Affordable Plumbing Services. Serving Collin County with 30+ years of experience. Call or text (469) 900-5194." />
   <link rel="stylesheet" href="style.css" />
 
   <!-- Google Tag Manager -->
@@ -20,6 +19,7 @@
 </head>
 
 <body>
+
   <!-- Google Tag Manager (noscript) -->
   <noscript>
     <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K82LHLQQ"
@@ -28,6 +28,7 @@
   <!-- End Google Tag Manager (noscript) -->
 
   <div class="container">
+
     <img src="logo.png" alt="A-1 Affordable Plumbing Services Logo" class="logo" />
 
     <h2 class="subheading">A-1 Affordable Plumbing Services</h2>
@@ -38,10 +39,13 @@
     </p>
 
     <p class="call-now">
-      📞 Call or Text Now: <a href="tel:14699005194">(469) 900-5194</a>
+      📞 Call or Text Now:
+      <a href="tel:+14699005194">(469) 900-5194</a>
     </p>
 
     <form id="quoteForm">
+
+      <!-- CONTACT INFO -->
       <fieldset>
         <legend>Contact Information</legend>
 
@@ -58,6 +62,7 @@
         <input type="text" id="address" name="address" required />
       </fieldset>
 
+      <!-- JOB DETAILS -->
       <fieldset>
         <legend>Job Details</legend>
 
@@ -72,24 +77,32 @@
         <textarea id="problem_description" name="problem_description" required></textarea>
 
         <label for="problem_start_date">When Did the Issue Start?</label>
-        <input type="date" id="problem_start_date" name="problem_start_date" />
+        <input type="date" id="problem_start_date" name="problem_start_date" required />
 
         <label for="jobPhoto">Upload a Photo (Optional):</label>
         <input type="file" id="jobPhoto" name="jobPhoto" />
       </fieldset>
 
-      <div class="trust-signals">
-        ✔ Free Estimates &nbsp; | &nbsp;
-        ✔ Fast Scheduling &nbsp; | &nbsp;
-        ✔ Upfront Pricing
-      </div>
-
       <button type="submit">Request My Quote</button>
 
+      <p class="form-note">
+        We typically respond within 15–30 minutes during business hours.
+      </p>
+
       <p id="responseMessage" class="hidden"></p>
+
     </form>
+
+    <div class="trust-badges">
+      ✔ Free Estimates &nbsp; | &nbsp;
+      ✔ Fast Scheduling &nbsp; | &nbsp;
+      ✔ Upfront Pricing
+    </div>
+
   </div>
 
+  <!-- Script -->
   <script src="submit-v2.js"></script>
+
 </body>
 </html>
