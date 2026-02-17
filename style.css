@@ -246,3 +246,12 @@ button:active {
   }
 }
 
+/* ===== CITY STRIP ===== */
+.city-strip {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 14px;
+  color: #475569;
+  font-weight: 500;
+  line-height: 1.6;
+}
