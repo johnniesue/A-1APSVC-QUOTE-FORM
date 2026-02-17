@@ -1,4 +1,4 @@
-/* ===== GLOBAL RESET ===== */
+/* ================= GLOBAL RESET ================= */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,7 +6,7 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ===== PAGE BACKGROUND ===== */
+/* ================= PAGE BACKGROUND ================= */
 body {
   background: #f4f6f9;
   color: #1e293b;
@@ -14,70 +14,99 @@ body {
   padding: 20px;
 }
 
-/* ===== MAIN CONTAINER ===== */
+/* ================= MAIN CONTAINER ================= */
 .container {
   max-width: 720px;
   margin: auto;
   background: #ffffff;
-  padding: 40px 30px;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 45px 35px;
+  border-radius: 16px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
 }
 
-/* ===== LOGO ===== */
+/* ================= HERO SECTION ================= */
+.hero {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
 .logo {
   display: block;
-  margin: 0 auto 20px;
+  margin: 0 auto 18px;
   max-width: 110px;
 }
 
-/* ===== HEADINGS ===== */
-.subheading {
-  text-align: center;
-  font-weight: 600;
+.company-name {
   font-size: 20px;
-  color: #0f3d66;
-  margin-bottom: 10px;
-}
-
-h1 {
-  text-align: center;
-  font-size: 30px;
-  margin-bottom: 15px;
-  color: #0b5ea8;
-}
-
-.tagline {
-  text-align: center;
-  font-size: 16px;
-  margin-bottom: 20px;
-  color: #475569;
-}
-
-/* ===== CALL NOW ===== */
-.call-now {
-  text-align: center;
   font-weight: 600;
-  margin-bottom: 25px;
-  font-size: 17px;
+  color: #0f3d66;
+  margin-bottom: 6px;
 }
 
-.call-now a {
+.main-heading {
+  font-size: 32px;
+  color: #0b5ea8;
+  margin-bottom: 18px;
+}
+
+/* ================= TRUST BAR ================= */
+.trust-bar {
+  margin-bottom: 22px;
+}
+
+.stars {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f4b400;
+  margin-bottom: 6px;
+}
+
+.stars span {
+  color: #1e293b;
+  font-weight: 500;
+  margin-left: 5px;
+}
+
+.license,
+.experience {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 4px;
+}
+
+/* ================= CALL BOX ================= */
+.call-box {
+  background: #f1f5f9;
+  padding: 16px;
+  border-radius: 10px;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.call-label {
+  display: block;
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 4px;
+}
+
+.call-number {
+  font-size: 20px;
+  font-weight: 700;
   color: #0b5ea8;
   text-decoration: none;
-  font-weight: bold;
 }
 
-.call-now a:hover {
+.call-number:hover {
   text-decoration: underline;
 }
 
-/* ===== FIELDSETS ===== */
+/* ================= FIELDSETS ================= */
 fieldset {
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 25px;
+  border-radius: 12px;
+  padding: 22px;
+  margin-bottom: 28px;
   background: #f8fafc;
 }
 
@@ -87,20 +116,20 @@ legend {
   color: #0b5ea8;
 }
 
-/* ===== LABELS ===== */
+/* ================= FORM LABELS ================= */
 label {
   display: block;
-  margin-top: 15px;
+  margin-top: 16px;
   margin-bottom: 6px;
   font-weight: 500;
 }
 
-/* ===== INPUTS ===== */
+/* ================= FORM INPUTS ================= */
 input,
 select,
 textarea {
   width: 100%;
-  padding: 12px;
+  padding: 13px;
   border-radius: 8px;
   border: 1px solid #cbd5e1;
   font-size: 14px;
@@ -117,11 +146,11 @@ textarea:focus {
 }
 
 textarea {
-  min-height: 110px;
+  min-height: 120px;
   resize: vertical;
 }
 
-/* ===== BUTTON ===== */
+/* ================= BUTTON ================= */
 button {
   width: 100%;
   margin-top: 20px;
@@ -138,31 +167,31 @@ button {
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(11, 94, 168, 0.3);
+  box-shadow: 0 8px 22px rgba(11, 94, 168, 0.3);
 }
 
 button:active {
   transform: translateY(0);
 }
 
-/* ===== FORM NOTE ===== */
+/* ================= FORM NOTE ================= */
 .form-note {
   text-align: center;
   font-size: 14px;
-  margin-top: 12px;
+  margin-top: 14px;
   color: #64748b;
 }
 
-/* ===== TRUST BADGES ===== */
+/* ================= TRUST BADGES ================= */
 .trust-badges {
-  margin-top: 30px;
+  margin-top: 24px;
   text-align: center;
   font-size: 15px;
   font-weight: 500;
   color: #0f3d66;
 }
 
-/* ===== RESPONSE MESSAGE ===== */
+/* ================= RESPONSE MESSAGE ================= */
 #responseMessage {
   margin-top: 15px;
   text-align: center;
@@ -173,63 +202,7 @@ button:active {
   display: none;
 }
 
-/* ===== MOBILE OPTIMIZATION ===== */
-@media (max-width: 600px) {
-  .container {
-    padding: 25px 20px;
-  }
-
-  h1 {
-    font-size: 24px;
-  }
-
-  .subheading {
-    font-size: 18px;
-  }
-}
-
-.review-line {
-  font-weight: 600;
-  color: #f4b400;
-  margin-top: 10px;
-  font-size: 18px;
-}
-
-.license-line {
-  font-size: 14px;
-  color: #555;
-  margin-top: 5px;
-}
-
-.call-now {
-  margin-top: 15px;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.call-now a {
-  color: #0b5fa5;
-  text-decoration: none;
-}
-
-.call-now a:hover {
-  text-decoration: underline;
-}
-
-.form-note {
-  margin-top: 15px;
-  font-size: 14px;
-  color: #555;
-}
-
-.trust-badges {
-  margin-top: 20px;
-  font-size: 15px;
-  color: #0b5fa5;
-  font-weight: 500;
-}
-
-/* Sticky Call Bar */
+/* ================= STICKY MOBILE CALL BAR ================= */
 .sticky-call {
   display: none;
 }
@@ -240,7 +213,7 @@ button:active {
     position: fixed;
     bottom: 0;
     width: 100%;
-    background: #0b5fa5;
+    background: #0b5ea8;
     text-align: center;
     padding: 14px 0;
     z-index: 999;
@@ -257,3 +230,19 @@ button:active {
     padding-bottom: 70px;
   }
 }
+
+/* ================= MOBILE OPTIMIZATION ================= */
+@media (max-width: 600px) {
+  .container {
+    padding: 30px 20px;
+  }
+
+  .main-heading {
+    font-size: 26px;
+  }
+
+  .company-name {
+    font-size: 18px;
+  }
+}
+
