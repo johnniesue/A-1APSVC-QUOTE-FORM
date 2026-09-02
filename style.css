@@ -150,6 +150,17 @@ textarea {
   resize: vertical;
 }
 
+/* ================= ADDRESS GRID ================= */
+.address-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(90px, 0.75fr) minmax(110px, 1fr);
+  column-gap: 14px;
+}
+
+.address-field--street {
+  grid-column: 1 / -1;
+}
+
 /* ================= BUTTON ================= */
 button {
   width: 100%;
@@ -235,6 +246,14 @@ button:active {
 @media (max-width: 600px) {
   .container {
     padding: 30px 20px;
+  }
+
+  .address-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .address-field--street {
+    grid-column: auto;
   }
 
   .main-heading {
