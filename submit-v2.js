@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
       property_type: form.property_type?.value || "",
       problem_description: form.problem_description.value.trim(),
       problem_start_date: formattedDate,
-      issue_types: [form.problem_description.value.trim()],
       website: form.website?.value || "",
       idempotency_key: idempotencyKey,
     };
