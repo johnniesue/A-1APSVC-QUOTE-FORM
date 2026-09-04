@@ -285,9 +285,46 @@ test("migration keeps every security object private", async () => {
     "consume_quote_form_rate_limit",
     "claim_quote_form_submission",
     "prepare_quote_form_job",
+    "cleanup_quote_form_security_records",
   ]) {
     assert.match(migration, new RegExp(`revoke all on function public\\.${functionName}`, "iu"));
   }
   assert.doesNotMatch(migration, /security definer/iu);
   assert.match(migration, /on conflict \(organization_id, subject_hash, window_started_at\)[\s\S]*request_count = public\.quote_form_rate_limits\.request_count \+ 1/iu);
+});
+
+test("retention cleanup removes only expired security rows in bounded batches", async () => {
+  const migration = await readFile(migrationUrl, "utf8");
+  const cleanupBody = migration.slice(
+    migration.indexOf("create or replace function public.cleanup_quote_form_security_records"),
+    migration.indexOf("revoke all on function public.consume_quote_form_rate_limit"),
+  );
+
+  assert.match(cleanupBody, /p_batch_size < 1 or p_batch_size > 500/iu);
+  assert.equal((cleanupBody.match(/limit p_batch_size/gu) || []).length, 2);
+  assert.equal((cleanupBody.match(/for update skip locked/gu) || []).length, 2);
+  assert.equal((cleanupBody.match(/expires_at <= v_now/gu) || []).length, 2);
+  assert.equal((cleanupBody.match(/delete from public\.quote_form_submission_guards/gu) || []).length, 1);
+  assert.equal((cleanupBody.match(/delete from public\.quote_form_rate_limits/gu) || []).length, 1);
+  assert.match(cleanupBody, /set statement_timeout = '10s'/iu);
+  assert.doesNotMatch(
+    cleanupBody,
+    /(?:delete|update|insert)\s+(?:from|into)?\s*public\.(?:customers|properties|addresses|jobs|emails)|storage\.|job-photos/iu,
+  );
+});
+
+test("retention cleanup is owner-only and scheduled through Supabase Cron", async () => {
+  const migration = await readFile(migrationUrl, "utf8");
+  assert.match(migration, /create extension if not exists pg_cron/iu);
+  assert.match(
+    migration,
+    /revoke all on function public\.cleanup_quote_form_security_records\(integer\)\s+from public, anon, authenticated, service_role/iu,
+  );
+  assert.match(
+    migration,
+    /select cron\.schedule\(\s*'cleanup-quote-form-security-records',\s*'17 \* \* \* \*',\s*\$cron\$select public\.cleanup_quote_form_security_records\(500\);\$cron\$\s*\)/iu,
+  );
+  assert.match(migration, /quote_form_submission_guards_expires_at_idx/iu);
+  assert.match(migration, /quote_form_rate_limits_expires_at_idx/iu);
+  assert.doesNotMatch(migration, /grant execute on function public\.cleanup_quote_form_security_records/iu);
 });

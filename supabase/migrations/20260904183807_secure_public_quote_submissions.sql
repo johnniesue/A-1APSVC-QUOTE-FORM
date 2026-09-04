@@ -1,3 +1,5 @@
+create extension if not exists pg_cron;
+
 create table if not exists public.quote_form_rate_limits (
   organization_id uuid not null,
   subject_hash text not null,
@@ -423,12 +425,80 @@ begin
 end;
 $$;
 
+create or replace function public.cleanup_quote_form_security_records(
+  p_batch_size integer default 500
+)
+returns table (
+  deleted_submission_guards integer,
+  deleted_rate_limits integer
+)
+language plpgsql
+security invoker
+set search_path = pg_catalog, public
+set statement_timeout = '10s'
+as $$
+declare
+  v_now timestamptz := clock_timestamp();
+  v_deleted_submission_guards integer := 0;
+  v_deleted_rate_limits integer := 0;
+begin
+  if p_batch_size < 1 or p_batch_size > 500 then
+    raise exception 'invalid cleanup batch size' using errcode = '22023';
+  end if;
+
+  with expired_submission_guards as (
+    select guard.id
+    from public.quote_form_submission_guards as guard
+    where guard.expires_at <= v_now
+    order by guard.expires_at, guard.id
+    limit p_batch_size
+    for update skip locked
+  ), deleted as (
+    delete from public.quote_form_submission_guards as guard
+    using expired_submission_guards as expired
+    where guard.id = expired.id
+    returning 1
+  )
+  select count(*)::integer into v_deleted_submission_guards
+  from deleted;
+
+  with expired_rate_limits as (
+    select
+      rate_limit.organization_id,
+      rate_limit.subject_hash,
+      rate_limit.window_started_at
+    from public.quote_form_rate_limits as rate_limit
+    where rate_limit.expires_at <= v_now
+    order by
+      rate_limit.expires_at,
+      rate_limit.organization_id,
+      rate_limit.subject_hash,
+      rate_limit.window_started_at
+    limit p_batch_size
+    for update skip locked
+  ), deleted as (
+    delete from public.quote_form_rate_limits as rate_limit
+    using expired_rate_limits as expired
+    where rate_limit.organization_id = expired.organization_id
+      and rate_limit.subject_hash = expired.subject_hash
+      and rate_limit.window_started_at = expired.window_started_at
+    returning 1
+  )
+  select count(*)::integer into v_deleted_rate_limits
+  from deleted;
+
+  return query select v_deleted_submission_guards, v_deleted_rate_limits;
+end;
+$$;
+
 revoke all on function public.consume_quote_form_rate_limit(uuid, text, integer, integer)
   from public, anon, authenticated;
 revoke all on function public.claim_quote_form_submission(uuid, text, text, text, uuid, integer)
   from public, anon, authenticated;
 revoke all on function public.prepare_quote_form_job(uuid, uuid, uuid, text, text, text, text, text, text, text, text, text)
   from public, anon, authenticated;
+revoke all on function public.cleanup_quote_form_security_records(integer)
+  from public, anon, authenticated, service_role;
 
 grant execute on function public.consume_quote_form_rate_limit(uuid, text, integer, integer)
   to service_role;
@@ -436,3 +506,9 @@ grant execute on function public.claim_quote_form_submission(uuid, text, text, t
   to service_role;
 grant execute on function public.prepare_quote_form_job(uuid, uuid, uuid, text, text, text, text, text, text, text, text, text)
   to service_role;
+
+select cron.schedule(
+  'cleanup-quote-form-security-records',
+  '17 * * * *',
+  $cron$select public.cleanup_quote_form_security_records(500);$cron$
+);
