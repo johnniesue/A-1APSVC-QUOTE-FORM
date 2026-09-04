@@ -1,5 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
+import {
+  createSafeReference,
+  enforceDatabaseRateLimit,
+  genericErrorBody,
+  getClientIp,
+  hmacIdentifier,
+  isHoneypotTriggered,
+  QuoteSecurityError,
+  runIdempotentQuote,
+  sha256Hex,
+  validateIdempotencyKey,
+} from "./quote-security.mjs";
 
 const ORGANIZATION_ID = "26727e0d-dbc8-4033-af51-dcaa3a50bc5d";
 
@@ -8,6 +20,13 @@ const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
+
+function jsonResponse(body: unknown, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
 // 🔥 Your real logo URL:
 const LOGO_URL =
@@ -82,8 +101,16 @@ serve(async (req: Request) => {
     });
   }
 
+  const safeReference = createSafeReference();
+  let guardId: string | null = null;
+  let supabase: ReturnType<typeof createClient> | null = null;
+
   try {
     const payload = await req.json();
+
+    if (isHoneypotTriggered(payload)) {
+      return jsonResponse(genericErrorBody(safeReference), 400);
+    }
 
     // Required fields validation
     const required = [
@@ -93,17 +120,12 @@ serve(async (req: Request) => {
       "address",
       "property_type",
       "problem_description",
+      "idempotency_key",
     ];
     const missing = required.filter((k) => !payload?.[k]);
 
     if (missing.length) {
-      return new Response(
-        JSON.stringify({ error: `Missing fields: ${missing.join(", ")}` }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
-      );
+      return jsonResponse(genericErrorBody(safeReference), 400);
     }
 
     const {
@@ -117,6 +139,7 @@ serve(async (req: Request) => {
       property_type,
       problem_start_date,
       problem_description,
+      idempotency_key,
     } = payload;
 
     // Keep older form submissions compatible while the frontend rolls forward.
@@ -135,26 +158,124 @@ serve(async (req: Request) => {
     const formattedAddress = `${address}, ${city}, ${state} ${zip}`;
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY") ?? "";
-    if (!resendApiKey) {
-      return new Response(
-        JSON.stringify({ error: "Missing RESEND_API_KEY" }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
-      );
+    const rateLimitSecret = Deno.env.get("QUOTE_RATE_LIMIT_SECRET") ?? "";
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    if (!resendApiKey || !rateLimitSecret || !supabaseUrl || !serviceRoleKey) {
+      throw new QuoteSecurityError("Required server configuration is unavailable", {
+        status: 503,
+        code: "server_configuration_unavailable",
+        reference: safeReference,
+      });
     }
 
+    const admin = createClient(supabaseUrl, serviceRoleKey);
+    supabase = admin;
+
+    const normalizedIdempotencyKey = validateIdempotencyKey(idempotency_key);
+    const idempotencyKeyHash = await sha256Hex(normalizedIdempotencyKey);
+    const requestFingerprint = await hmacIdentifier(JSON.stringify({
+      full_name,
+      email,
+      phone_number,
+      address,
+      city,
+      state,
+      zip,
+      property_type,
+      problem_start_date: problem_start_date ?? null,
+      problem_description,
+    }), rateLimitSecret);
+
+    const claimFromExisting = (existingGuard: any) => {
+      if (existingGuard.request_fingerprint !== requestFingerprint) {
+        throw new QuoteSecurityError("Request identifier conflict", {
+          status: 409,
+          code: "idempotency_conflict",
+          reference: existingGuard.request_reference,
+        });
+      }
+      if (existingGuard.state === "completed" && existingGuard.result) {
+        return {
+          kind: "replay",
+          result: jsonResponse(existingGuard.result, 200),
+        };
+      }
+      return {
+        kind: "pending",
+        reference: existingGuard.request_reference,
+      };
+    };
+
+    const readExistingGuard = async () => {
+      const { data, error } = await admin
+        .from("quote_form_submission_guards")
+        .select("id, request_fingerprint, state, request_reference, result")
+        .eq("organization_id", ORGANIZATION_ID)
+        .eq("idempotency_key_hash", idempotencyKeyHash)
+        .maybeSingle();
+      if (error) throw new Error("Unable to read the existing request guard");
+      return data;
+    };
+
+    let claim;
+    const existingGuard = await readExistingGuard();
+    if (existingGuard) {
+      claim = claimFromExisting(existingGuard);
+    } else {
+      const clientIp = getClientIp(req.headers);
+      const subjectHash = await hmacIdentifier(clientIp, rateLimitSecret);
+      await enforceDatabaseRateLimit(async ({ subjectHash, limit, windowSeconds }) => {
+        const { data, error } = await admin.rpc("consume_quote_form_rate_limit", {
+          p_organization_id: ORGANIZATION_ID,
+          p_subject_hash: subjectHash,
+          p_limit: limit,
+          p_window_seconds: windowSeconds,
+        });
+        if (error) throw new Error("Unable to evaluate the request rate limit");
+        return Array.isArray(data) ? data[0] : data;
+      }, {
+        subjectHash,
+        reference: safeReference,
+      });
+
+      const { data: insertedGuard, error: insertGuardError } = await admin
+        .from("quote_form_submission_guards")
+        .insert({
+          organization_id: ORGANIZATION_ID,
+          idempotency_key_hash: idempotencyKeyHash,
+          request_fingerprint: requestFingerprint,
+          request_reference: safeReference,
+        })
+        .select("id, request_reference")
+        .single();
+
+      if (!insertGuardError && insertedGuard) {
+        guardId = insertedGuard.id;
+        claim = {
+          kind: "owner",
+          guardId,
+          reference: insertedGuard.request_reference,
+        };
+      } else if (insertGuardError?.code === "23505") {
+        const concurrentGuard = await readExistingGuard();
+        if (!concurrentGuard) {
+          throw new Error("Unable to read the concurrent request guard");
+        }
+        claim = claimFromExisting(concurrentGuard);
+      } else {
+        throw new Error("Unable to create the request guard");
+      }
+    }
+
+    const response = await runIdempotentQuote({
+      claim: async () => claim,
+      execute: async (ownedClaim) => {
+        guardId = ownedClaim.guardId;
 
     /* ----------------------------------------------------------------------
-   INSERT CUSTOMER INTO SUPABASE
-  ---------------------------------------------------------------------- */
-
-
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-);
+       INSERT CUSTOMER INTO SUPABASE
+    ---------------------------------------------------------------------- */
 
 // split full name
 const nameParts = full_name.trim().split(" ");
@@ -168,7 +289,7 @@ const last_name = nameParts.join(" ") ?? "";
 let customer;
 
 // Check if customer already exists by phone OR email
-const { data: existingCustomer, error: existingCustomerError } = await supabase
+const { data: existingCustomer, error: existingCustomerError } = await admin
   .from("customers")
   .select("*")
   .eq("organization_id", ORGANIZATION_ID)
@@ -188,7 +309,7 @@ if (existingCustomer) {
 
 } else {
 
-  const { data: newCustomer, error: customerError } = await supabase
+  const { data: newCustomer, error: customerError } = await admin
     .from("customers")
     .insert({
       first_name,
@@ -215,7 +336,7 @@ if (existingCustomer) {
    CREATE PROPERTY
 ---------------------------------------------------------------------- */
 
-const { data: property, error: propertyError } = await supabase
+const { data: property, error: propertyError } = await admin
   .from("properties")
   .insert({
     customer_id: customer.id,
@@ -241,7 +362,7 @@ if (propertyError || !property) {
    CREATE ADDRESS
 ---------------------------------------------------------------------- */
 
-const { data: addressRecord, error: addressError } = await supabase
+const { data: addressRecord, error: addressError } = await admin
   .from("addresses")
   .insert({
     customer_id: customer.id,
@@ -269,7 +390,7 @@ if (addressError || !addressRecord) {
    CREATE JOB
 ---------------------------------------------------------------------- */
 
-const { data: job, error: jobError } = await supabase
+const { data: job, error: jobError } = await admin
     .from("jobs")
     .insert({
       customer_id: customer.id,
@@ -291,6 +412,19 @@ if (jobError || !job) {
     `Job insert failed: ${jobError?.message ?? "No job record returned"}`,
   );
 }
+
+    const { error: linkGuardError } = await admin
+      .from("quote_form_submission_guards")
+      .update({
+        customer_id: customer.id,
+        property_id: property.id,
+        address_id: addressRecord.id,
+        job_id: job.id,
+        office_email_status: "sending",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", guardId);
+    if (linkGuardError) throw new Error("Unable to link the durable request guard");
 
 
     /* ----------------------------------------------------------------------
@@ -328,16 +462,35 @@ if (jobError || !job) {
     });
 
     if (!internalResponse.ok) {
-      const err = await internalResponse.text();
-      console.error("Internal email error:", err);
-      return new Response(
-        JSON.stringify({
-          error: "Internal email failed",
-          details: err,
-        }),
-        { status: 500, headers: corsHeaders },
-      );
+      console.error("Office quote email failed", {
+        reference: ownedClaim.reference,
+        status: internalResponse.status,
+      });
+      await admin
+        .from("quote_form_submission_guards")
+        .update({
+          state: "failed",
+          office_email_status: "failed",
+          error_reference: ownedClaim.reference,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", guardId);
+      throw new QuoteSecurityError("Office notification failed", {
+        status: 502,
+        code: "office_notification_failed",
+        reference: ownedClaim.reference,
+      });
     }
+
+    const { error: officeStatusError } = await admin
+      .from("quote_form_submission_guards")
+      .update({
+        office_email_status: "sent",
+        customer_email_status: "sending",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", guardId);
+    if (officeStatusError) throw new Error("Unable to record office email delivery");
 
     /* ----------------------------------------------------------------------
        2) CUSTOMER CONFIRMATION EMAIL (branded)
@@ -387,36 +540,70 @@ if (jobError || !job) {
     });
 
     if (!confirmationResponse.ok) {
-      const err = await confirmationResponse.text();
-      console.error("Confirmation email error:", err);
-      return new Response(
-        JSON.stringify({
-          error: "Customer confirmation failed",
-          details: err,
-        }),
-        { status: 500, headers: corsHeaders },
-      );
+      console.error("Customer quote email failed", {
+        reference: ownedClaim.reference,
+        status: confirmationResponse.status,
+      });
+      await admin
+        .from("quote_form_submission_guards")
+        .update({
+          state: "failed",
+          customer_email_status: "failed",
+          error_reference: ownedClaim.reference,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", guardId);
+      throw new QuoteSecurityError("Customer confirmation failed", {
+        status: 502,
+        code: "customer_notification_failed",
+        reference: ownedClaim.reference,
+      });
     }
 
     /* ----------------------------------------------------------------------
        SUCCESS
     ---------------------------------------------------------------------- */
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: "Emails sent to office and customer successfully",
-      }),
-      { status: 200, headers: corsHeaders },
-    );
+    const result = {
+      success: true,
+      message: "Emails sent to office and customer successfully",
+      request_reference: ownedClaim.reference,
+    };
+    const { error: completionError } = await admin
+      .from("quote_form_submission_guards")
+      .update({
+        state: "completed",
+        customer_email_status: "sent",
+        result,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", guardId);
+    if (completionError) throw new Error("Unable to record quote completion");
+
+    return jsonResponse(result, 200);
+      },
+    });
+
+    return response;
 
   } catch (err: any) {
-    console.error("Function error:", err);
-    return new Response(
-      JSON.stringify({
-        error: "Internal Server Error",
-        details: err?.message ?? String(err),
-      }),
-      { status: 500, headers: corsHeaders },
-    );
+    const reference = err instanceof QuoteSecurityError && err.reference
+      ? err.reference
+      : safeReference;
+    if (guardId && supabase) {
+      await supabase
+        .from("quote_form_submission_guards")
+        .update({
+          state: "failed",
+          error_reference: reference,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", guardId);
+    }
+    console.error("Quote submission failed", {
+      reference,
+      errorType: err?.name ?? "Error",
+    });
+    const status = err instanceof QuoteSecurityError ? err.status : 500;
+    return jsonResponse(genericErrorBody(reference), status);
   }
 });

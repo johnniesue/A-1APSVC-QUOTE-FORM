@@ -3,11 +3,19 @@
 
 const ENDPOINT =
   "https://zzigzylypifjokskehkn.functions.supabase.co/send-quote-email";
+const IDEMPOTENCY_STORAGE_KEY = "a1_quote_form_idempotency_key";
+
+function createIdempotencyKey() {
+  return crypto.randomUUID();
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("quoteForm");
   const responseMessage = document.getElementById("responseMessage");
   const submitBtn = form.querySelector("button[type='submit']");
+  let idempotencyKey =
+    sessionStorage.getItem(IDEMPOTENCY_STORAGE_KEY) || createIdempotencyKey();
+  sessionStorage.setItem(IDEMPOTENCY_STORAGE_KEY, idempotencyKey);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -34,6 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
       problem_description: form.problem_description.value.trim(),
       problem_start_date: formattedDate,
       issue_types: [form.problem_description.value.trim()],
+      website: form.website?.value || "",
+      idempotency_key: idempotencyKey,
     };
 
     try {
@@ -47,19 +57,23 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(data),
       });
 
-      if (res.ok) {
+      const result = await res.json().catch(() => ({}));
+
+      if (res.ok && result.success) {
         responseMessage.textContent = "✅ Quote request submitted successfully!";
         responseMessage.className = "success";
         form.reset();
+        sessionStorage.removeItem(IDEMPOTENCY_STORAGE_KEY);
+        idempotencyKey = createIdempotencyKey();
+        sessionStorage.setItem(IDEMPOTENCY_STORAGE_KEY, idempotencyKey);
       } else {
-        const errText = await res.text();
-        console.error("Submission failed:", errText);
-        responseMessage.textContent =
-          "❌ Error submitting request. Please try again.";
+        const reference = result.reference
+          ? ` Reference: ${result.reference}`
+          : "";
+        responseMessage.textContent = `❌ We could not submit your request. Please try again.${reference}`;
         responseMessage.className = "error";
       }
     } catch (err) {
-      console.error("Unexpected error:", err);
       responseMessage.textContent =
         "❌ Network error. Please check your connection and try again.";
       responseMessage.className = "error";
