@@ -108,8 +108,10 @@
         <label for="problem_start_date">When Did the Issue Start?</label>
         <input type="date" id="problem_start_date" name="problem_start_date" required />
 
-        <label for="jobPhoto">Upload a Photo (Optional):</label>
-        <input type="file" id="jobPhoto" name="jobPhoto" />
+        <div class="website-field" aria-hidden="true">
+          <label for="website">Website:</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+        </div>
       </fieldset>
 
       <button type="submit">Request My Quote</button>
